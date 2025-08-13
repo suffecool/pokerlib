@@ -5,7 +5,7 @@
 
 // Poker hand evaluator
 //
-// Kevin L. Suffecool
+// Kevin L. Suffecool (a.k.a. "Cactus Kev")
 // kevin@suffe.cool
 //
 
@@ -13,52 +13,50 @@ void srand48();
 double drand48();
 
 //
-//   This routine initializes the deck.  A deck of cards is
-//   simply an integer array of length 52 (no jokers).  This
-//   array is populated with each card, using the following
-//   scheme:
+//   This routine initializes the deck.  A deck of cards is simply
+//   an integer array of length 52 (no jokers).  This array is
+//   populated with each card, using the following scheme:
 //
-//   An integer is made up of four bytes.  The high-order
-//   bytes are used to hold the rank bit pattern, whereas
-//   the low-order bytes hold the suit/rank/prime value
-//   of the card.
+//   An integer is made up of four bytes.  The high-order bytes are
+//   used to hold the rank bit pattern, whereas the low-order bytes
+//   hold the suit/rank/prime value of the card.
 //
 //   +--------+--------+--------+--------+
-//   |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
+//   |xbbbbbbb|bbbbbbxx|cdhsrrrr|xxpppppp|
 //   +--------+--------+--------+--------+
 //
 //   p = prime number of rank (deuce=2,trey=3,four=5,five=7,...,ace=41)
-//   r = rank of card (deuce=0,trey=1,four=2,five=3,...,ace=12)
+//   r = rank of card (deuce=2,trey=3,four=4,five=5,...,ace=14)
 //   cdhs = suit of card
 //   b = bit turned on depending on rank of card
 //
-//   As an example, the Five of Hearts would be represented as
+//   As an example, the Five of Hearts would be represented as:
 //
 //   +--------+--------+--------+--------+
-//   |00000000|00001000|00100011|00000111| = 0x00082307
+//   |00000000|00100000|00100101|00000111| = 0x00202507
 //   +--------+--------+--------+--------+
 //
-//   and the Queen of Clubs would be represented as
+//   and the Queen of Clubs would be represented as:
 //
 //   +--------+--------+--------+--------+
-//   |00000100|00000000|10001010|00011111| = 0x04008A1F
+//   |00010000|00000000|10001100|00011111| = 0x10008C1F
 //   +--------+--------+--------+--------+
 //
 void
 init_deck(int *deck)
 {
-    int n = 0, suit = 0x8000;
+    int n = 0, suit = CLUB;
 
     for (int i = 0; i < 4; i++, suit >>= 1)
         for (int j = 0; j < 13; j++, n++)
-            deck[n] = primes[j] | (j << 8) | suit | (1 << (16+j));
+            deck[n] = primes[j] | ((2+j) << 8) | suit | (1 << (16+j));
 }
 
 
 //  This routine will search a deck for a specific card
 //  (specified by rank/suit), and return the INDEX giving
 //  the position of the found card.  If it is not found,
-//  then it returns -1
+//  then it returns -1.
 //
 int
 find_card(int rank, int suit, int *deck)
@@ -98,22 +96,25 @@ shuffle_deck(int *deck)
 
 //
 //  This routine prints the given hand as a string; e.g.
-//  Ac 4d 7c Jh 2s
+//
+//      Ac 4d 7c Jh 2s
+//
+//  It does NOT print a trailing newline.
 //
 void
 print_hand(int *hand, int n)
 {
     char suit;
-    static char *rank = "23456789TJQKA";
+    static char *rank = "??23456789TJQKA?";
 
     for (int i = 0; i < n; i++, hand++)
     {
         int r = (*hand >> 8) & 0xF;
-        if (*hand & 0x8000)
+        if (*hand & CLUB)
             suit = 'c';
-        else if (*hand & 0x4000)
+        else if (*hand & DIAMOND)
             suit = 'd';
-        else if (*hand & 0x2000)
+        else if (*hand & HEART)
             suit = 'h';
         else
             suit = 's';
@@ -156,26 +157,30 @@ find_fast(unsigned u)
 }
 
 
+// Evaluates the given five-card poker cards.
+// Returns a number from 1 to 7462, where 1 is the best hand
+// possible (i.e. Royal Flush), and 7462 is the worst hand
+// possible (75432 unsuited).
 static unsigned short
 eval_5cards(int c1, int c2, int c3, int c4, int c5)
 {
     int q = (c1 | c2 | c3 | c4 | c5) >> 16;
     short s;
 
-    // This checks for Flushes and Straight Flushes
+    // This checks for Flushes and Straight Flushes.
     if (c1 & c2 & c3 & c4 & c5 & 0xf000)
         return flushes[q];
 
-    // This checks for Straights and High Card hands
+    // This checks for Straights and High Card hands.
     if ((s = unique5[q]))
         return s;
 
-    // This performs a perfect-hash lookup for remaining hands
+    // This performs a perfect-hash lookup for remaining hands.
     q = (c1 & 0xff) * (c2 & 0xff) * (c3 & 0xff) * (c4 & 0xff) * (c5 & 0xff);
     return hash_values[find_fast(q)];
 }
 
-
+// Evaluates the given five-card poker hand array.
 unsigned short
 eval_5hand(int *hand)
 {
