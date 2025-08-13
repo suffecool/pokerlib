@@ -24,7 +24,7 @@ int
 main()
 {
     int deck[52], hand[5], freq[10];
-    int a, b, c, d, e, i, j;
+    int value, n;
     struct timespec start, end;
     unsigned long elapsed_nsec;
 
@@ -32,32 +32,34 @@ main()
     init_deck(deck);
 
     // Zero out the frequency array.
-    for (i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++)
         freq[i] = 0;
 
     // Capture start time.
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     // Loop over every possible five-card hand.
-    for (a = 0; a < 48; a++)
+    for (int a = 0; a < 48; a++)
     {
         hand[0] = deck[a];
-        for (b = a+1; b < 49; b++)
+        for (int b = a+1; b < 49; b++)
         {
             hand[1] = deck[b];
-            for (c = b+1; c < 50; c++)
+            for (int c = b+1; c < 50; c++)
             {
                 hand[2] = deck[c];
-                for (d = c+1; d < 51; d++)
+                for (int d = c+1; d < 51; d++)
                 {
                     hand[3] = deck[d];
-                    for (e = d+1; e < 52; e++)
+                    for (int e = d+1; e < 52; e++)
                     {
                         hand[4] = deck[e];
 
-                        i = eval_5hand(hand);
-                        j = hand_rank(i);
-                        freq[j]++;
+                        value = eval_5hand(hand);
+                        n = hand_rank(value);
+                        //print_hand(hand, 5);
+                        //printf("  %s\n", value_str[n]);
+                        freq[n]++;
                     }
                 }
             }
@@ -67,7 +69,7 @@ main()
     // Capture end time.
     clock_gettime(CLOCK_MONOTONIC, &end);
 
-    for (i = 1; i <= 9; i++) {
+    for (int i = 1; i <= 9; i++) {
         printf("%15s: %8d", value_str[i], freq[i]);
         if (freq[i] != expected_freq[i])
             printf(" (expected %d)\n", expected_freq[i]);
