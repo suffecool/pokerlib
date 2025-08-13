@@ -28,19 +28,19 @@ static char *value_str[] = {
 #define HEART   0x2000
 #define SPADE   0x1000
 
-#define Deuce   0
-#define Trey    1
-#define Four    2
-#define Five    3
-#define Six     4
-#define Seven   5
-#define Eight   6
-#define Nine    7
-#define Ten     8
-#define Jack    9
-#define Queen   10
-#define King    11
-#define Ace     12
+#define Deuce   2
+#define Trey    3
+#define Four    4
+#define Five    5
+#define Six     6
+#define Seven   7
+#define Eight   8
+#define Nine    9
+#define Ten     10
+#define Jack    11
+#define Queen   12
+#define King    13
+#define Ace     14
 
 
 void
