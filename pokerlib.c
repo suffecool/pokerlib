@@ -22,7 +22,7 @@ double drand48();
 //   hold the suit/rank/prime value of the card.
 //
 //   +--------+--------+--------+--------+
-//   |xbbbbbbb|bbbbbbxx|cdhsrrrr|xxpppppp|
+//   |xxxbbbbb|bbbbbbbb|cdhsrrrr|xxpppppp|
 //   +--------+--------+--------+--------+
 //
 //   p = prime number of rank (deuce=2,trey=3,four=5,five=7,...,ace=41)
@@ -33,13 +33,13 @@ double drand48();
 //   As an example, the Five of Hearts would be represented as:
 //
 //   +--------+--------+--------+--------+
-//   |00000000|00100000|00100101|00000111| = 0x00202507
+//   |00000000|00001000|00100101|00000111| = 0x00082507
 //   +--------+--------+--------+--------+
 //
 //   and the Queen of Clubs would be represented as:
 //
 //   +--------+--------+--------+--------+
-//   |00010000|00000000|10001100|00011111| = 0x10008C1F
+//   |00000100|00000000|10001100|00011111| = 0x04008C1F
 //   +--------+--------+--------+--------+
 //
 void
